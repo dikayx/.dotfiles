@@ -20,7 +20,7 @@
     ./.dotfiles/install.sh -hn "My-MBP" -gn "John Doe" -ge "<your_mail>@example.com"
     ```
 
-    > Note: As Git name and email i would recommend using the one you use on GitHub.
+    > Note: I recommend using your GitHub email address and name here.
 
 _\*) All arguments are optional. You can show a help message by providing the `--help` flag._
 
