@@ -1,6 +1,6 @@
-###########################
-# Basic prompt settings:
-###########################
+#####################################################################################
+# Basic prompt settings:                                                            #
+#####################################################################################
 
 # Load version control information
 autoload -Uz vcs_info
@@ -18,9 +18,9 @@ zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr '!'
 zstyle ':vcs_info:*' unstagedstr '*'
 
-###########################
-# Prompt themes:
-###########################
+#####################################################################################
+# Prompt themes:                                                                    #
+#####################################################################################
 
 function precmd() {
     # Print a newline before the prompt, unless it's the first prompt in the process.
@@ -37,10 +37,12 @@ PROMPT='%F{014}%c%f${vcs_info_msg_0_}${NEWLINE}%(!.#.%F{046}❯%f) '
 # VCS (Git) style
 zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 
-###########################
-# Shortcuts & aliases:
-###########################
+#####################################################################################
+# Shortcuts & aliases:                                                              #
+#####################################################################################
 
 # Aliases
 alias gpgf="git pull && git fetch"
 alias bubu="brew update && brew upgrade && brew cleanup"
+alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
+
