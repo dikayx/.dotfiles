@@ -31,10 +31,10 @@ brew install smartmontools
 
 brew install --cask google-chrome
 brew install --cask google-drive
+brew install --cask discord
 brew install --cask spotify
 brew install --cask coconutbattery
 
-brew install --cask temurin@17
 brew install --cask visual-studio-code
 brew install --cask git-credential-manager
 
