@@ -17,8 +17,10 @@
 -   Run the script\*
 
     ```bash
-    ./.dotfiles/install.sh -h "My-MBP" -gn "John Doe" -ge "<your_mail>@example.com"
+    ./.dotfiles/install.sh -hn "My-MBP" -gn "John Doe" -ge "<your_mail>@example.com"
     ```
+
+    > Note: As Git name and email i would recommend using the one you use on GitHub.
 
 _\*) All arguments are optional. You can show a help message by providing the `--help` flag._
 
@@ -28,5 +30,5 @@ _\*) All arguments are optional. You can show a help message by providing the `-
 xcode-select --install \
   && git clone https://github.com/dikayx/.dotfiles.git \
   && chmod +x .dotfiles/*.sh \
-  && ./.dotfiles/install.sh -h "My-MBP"
+  && ./.dotfiles/install.sh -hn "My-MBP"
 ```
