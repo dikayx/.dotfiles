@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo -e "${RED}Invalid option: $1${ENDCOLOR}" >&2
+            cecho "Invalid option: $1" "$RED" >&2
             show_help
             exit 1
             ;;
@@ -91,13 +91,18 @@ CONFIGDIR="$DOTFILESDIR/configs"
 # Architecture specific setup                                                                        #
 #####################################################################################################
 
-# Get system architecture
+# Note: While almost every new Mac is Apple Silicon now, some still use Intel CPUs. To support both,
+# we need to check the architecture and adjust the setup accordingly.
+#
+# Intel Macs don't support Rosetta nor do they need to have a special shell environment for Homebrew,
+# as Homebrew installs to /usr/local on these machines, which is already in the PATH.
+#
+# I don't want to drop Intel support entirely yet, so this check is necessary.
+
 CPU_ARCH=$(uname -m)
 
-# Create a local .zprofile for custom env variables
 touch "${CONFIGDIR}/.zprofile"
 
-# Additional Homebrew settings for ARM Macs
 if [ "$CPU_ARCH" = "arm64" ]; then
     cecho "Apple Silicon Mac detected. Setting up Rosetta and Homebrew..." "$YELLOW"
     sudo softwareupdate --install-rosetta --agree-to-license
