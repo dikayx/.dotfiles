@@ -1,25 +1,125 @@
 #!/bin/zsh
 
 #####################################################################################################
-# This script sets up my Mac with all my favorite apps and tools and creates symlinks.              #
+# Mac Setup & Bootstrap Script                                                                      #
 #####################################################################################################
+
+# This script bootstraps a macOS environment with:
+#   - System configuration (hostname, architecture-specific setup)
+#   - Dotfile symlinking
+#   - Git global configuration
+#   - Homebrew installation (if missing)
+#   - Package installation via brew bundle
+#   - Vim configuration + plugin installation
+#
+# The script is intentionally structured into clear sections that mirror the style of Homebrew’s
+# output. Each section prints a headline followed by indented informational steps and ends with a
+# success message. This makes the output predictable, minimal and easy to visually scan.
+#
+# ---------------------------------------------------------------------------------------------------
+# Command Line Arguments
+# ---------------------------------------------------------------------------------------------------
+#   -hn, --hostname   <hostname>     Sets the macOS system hostname.
+#   -gn, --gitname    <gitname>      Sets the global Git user.name.
+#   -ge, --gitemail   <email>        Sets the global Git user.email.
+#   -h,  --help                      Shows a help message and exits.
+#
+# Examples:
+#     ./install.sh --hostname my-mac
+#     ./install.sh --gitname "John Doe" --gitemail john@example.com
+#
+# Arguments are optional. When omitted, the script simply skips those steps. However, the Git
+# configuration requires both --gitname and --gitemail to be provided to take effect.
+#
+# ---------------------------------------------------------------------------------------------------
+# Script Architecture
+# ---------------------------------------------------------------------------------------------------
+# The script is divided into the following phases:
+#
+#   1. Pre-Installation Setup
+#      - Applies system settings (hostname)
+#      - Detects CPU architecture (Intel / Apple Silicon)
+#      - Installs Rosetta 2 on Apple Silicon
+#      - Ensures Homebrew shellenv is configured
+#
+#   2. Configuration Setup
+#      - Creates expected directories
+#      - Reads all config files from ~/.dotfiles/configs
+#      - Symlinks them into the home directory
+#      - Applies Git configuration if provided
+#
+#   3. Package Installation
+#      - Installs Homebrew if not already present
+#      - Executes package installation (brew bundle)
+#
+#   4. Vim Setup
+#      - Installs vim-plug if missing
+#      - Installs Vim plugins using the provided .vimrc
+#
+#   5. Post Installation
+#      - Final status output
+#
+# ---------------------------------------------------------------------------------------------------
+# Logging & Output Format
+# ---------------------------------------------------------------------------------------------------
+# The script uses four output helpers to mimic Homebrew’s clean style:
+#
+#   headline "Title"
+#       Prints a section headline in the format:
+#           ==> Title
+#
+#   info "Message"
+#       Prints a simple info line describing a step inside a section.
+#
+#   success "Message"
+#       Prints a success confirmation at the end of a section or operation.
+#
+#   error "Message"
+#       Prints an error message with a red indicator/icon.
+#
+# Notes:
+#   - Headlines are used only once per major section.
+#   - Info lines are used for actions *within* a section.
+#   - Success is used to mark the completion of a section.
+#   - Error should be used for invalid arguments, failed commands, missing files, etc.
+#
+# ---------------------------------------------------------------------------------------------------
+# Requirements
+# ---------------------------------------------------------------------------------------------------
+# - macOS (Intel or Apple Silicon)
+# - curl
+# - Internet connection for Homebrew & Vim plug-in installation
+# - All scripts need to be executable (chmod +x)
 
 #####################################################################################################
 # Miscellanous                                                                                      #
 #####################################################################################################
 
-# Color codes for output
+# Color codes
 RED="\e[31m"        # Errors
 YELLOW="\e[33m"     # Warnings
 GREEN="\e[32m"      # Success
-ENDCOLOR="\e[0m"    # Reset
+BLUE="\e[34m"       # Information
+
+# Formatting rules
+BOLD="\e[1m"
+RESET="\e[0m"
+
+# Predefined symbols
+ARROW="${BLUE}==>${RESET}"
+OK="${GREEN}✔${RESET}"
+ERR="${RED}✘${RESET}"
 
 #####################################################################################################
 # Helpers                                                                                           #
 #####################################################################################################
 
-cecho() { echo -e "${2}$1${ENDCOLOR}"; }
-symlink() { ln -sf "$1" "$2"; cecho "Linked $2 -> $1" "$YELLOW"; }
+headline() { echo -e "${ARROW} ${BOLD}$1${RESET}"; }
+success() { echo -e "${OK} $1"; }
+error() { echo -e "${ERR} $1"; }
+info() { echo -e "- $1"; }
+
+symlink() { ln -sf "$1" "$2" && success "Linked $2 -> $1" || error "Failed to link $2"; }
 
 #####################################################################################################
 # Parse command line arguments                                                                      #
@@ -31,11 +131,11 @@ GITMAIL=""
 SHOW_HELP=false
 
 function show_help() {
-    echo -e "${YELLOW}Usage: ./install.sh [OPTIONS]${ENDCOLOR}"
+    echo -e "${BOLD}Usage: ./install.sh [OPTIONS]${RESET}"
     echo -e "\nOptions:"
     echo -e "  -hn, --hostname <hostname>  Set the hostname of the system."
-    echo -e "  -gn, --gitname <gitname>    Set the Git user name."
-    echo -e "  -ge, --gitemail <gitemail>  Set the Git user email."
+    echo -e "  -gn, --gitname <gitname>    Set the global Git user name."
+    echo -e "  -ge, --gitemail <gitemail>  Set the global Git user email."
     echo -e "  -h, --help                  Show this help message and exit."
 }
 
@@ -58,7 +158,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            cecho "Invalid option: $1" "$RED" >&2
+            error "Invalid option: $1"
             show_help
             exit 1
             ;;
@@ -71,25 +171,23 @@ if $SHOW_HELP; then
 fi
 
 #####################################################################################################
-# Preinstallation                                                                                   #
-#####################################################################################################
-
-if [ -n "$HOSTNAME" ]; then
-    cecho "Changing hostname to $HOSTNAME" "$YELLOW"
-    sudo scutil --set HostName "$HOSTNAME"
-fi
-
-#####################################################################################################
 # Directories                                                                                       #
 #####################################################################################################
 
-HOMEDIR="$HOME"
-DOTFILESDIR="$HOMEDIR/.dotfiles"
-CONFIGDIR="$DOTFILESDIR/configs"
+HOME_DIR="$HOME"
+DOTFILES_DIR="$HOME_DIR/.dotfiles"
+CONFIG_DIR="$DOTFILES_DIR/configs"
 
 #####################################################################################################
-# Architecture specific setup                                                                        #
+# Pre-Installation                                                                                  #
 #####################################################################################################
+
+headline "Pre-Installation Setup"
+
+if [ -n "$HOSTNAME" ]; then
+    info "Changing hostname to $HOSTNAME"
+    sudo scutil --set HostName "$HOSTNAME"
+fi
 
 # Note: While almost every new Mac is Apple Silicon now, some still use Intel CPUs. To support both,
 # we need to check the architecture and adjust the setup accordingly.
@@ -101,92 +199,100 @@ CONFIGDIR="$DOTFILESDIR/configs"
 
 CPU_ARCH=$(uname -m)
 
-touch "${CONFIGDIR}/.zprofile"
+touch "${CONFIG_DIR}/.zprofile"
 
 if [ "$CPU_ARCH" = "arm64" ]; then
-    cecho "Apple Silicon Mac detected. Setting up Rosetta and Homebrew..." "$YELLOW"
+    info "Apple Silicon Mac detected. Setting up Rosetta and Homebrew ..."
     sudo softwareupdate --install-rosetta --agree-to-license
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "${CONFIGDIR}/.zprofile"
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "${CONFIG_DIR}/.zprofile"
     eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-cecho "✅ Finished preliminary setup!" "$GREEN"
+success "Finished Pre-Installation Setup!"
 
 #####################################################################################################
 # Configuration                                                                                      #
 #####################################################################################################
 
-# Create necessary directories
-cecho "🗂 Creating necessary directories..." "$YELLOW"
-mkdir -p "$HOMEDIR/Projekte"
+headline "Configuration Setup"
 
-# Obtain list of config files from CONFIGDIR, ignoring . and ..
+# Create necessary directories
+info "Creating necessary directories ..."
+mkdir -p "$HOME_DIR/Projekte"
+
+# Obtain a list of config files from the config directory, ignoring . and ..
 files=()
-for f in "$CONFIGDIR"/.*; do
+for f in "$CONFIG_DIR"/.*; do
     [[ "$(basename "$f")" == "." || "$(basename "$f")" == ".." ]] && continue
-    [[ -f "$f" ]] || continue  # only regular files
+    [[ -f "$f" ]] || continue # only regular files
     files+=("$(basename "$f")")
 done
 
 # Create symlinks for each config file
+info "Creating symlinks ..."
 for file in "${files[@]}"; do
-    src="$CONFIGDIR/$file"
-    dest="$HOMEDIR/$file"
+    src="$CONFIG_DIR/$file"
+    dest="$HOME_DIR/$file"
     if [ -e "$src" ]; then
         symlink "$src" "$dest"
     else
-        cecho "⚠️ $file not found in $CONFIGDIR, skipping" "$RED"
+        error "$file not found in $CONFIG_DIR, skipping"
     fi
 done
 
 # Setup git if gitname and gitemail are given
 if [ -n "$GITNAME" ] && [ -n "$GITMAIL" ]; then
-    cecho "🔧 Setting up git..." "$YELLOW"
+    info "Setting up Git global configuration ..."
     git config --global user.name "$GITNAME"
     git config --global user.email "$GITMAIL"
 fi
     
-cecho "✅ Finished configuration!" "$GREEN"
+success "Finished Configuration Setup!"
 
 #####################################################################################################
-# Package installation                                                                              #
+# Package Installation                                                                              #
 #####################################################################################################
+
+headline "Package Installation"
 
 # Install Homebrew if missing
 if ! command -v brew &> /dev/null; then
-    cecho "🍺 Installing Homebrew..." "$YELLOW"
+    info "Installing Homebrew ..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-cecho "🍺 Installing packages..." "$YELLOW"
+info "Installing packages ..."
 ./brew.sh
-cecho "✅ Finished package installation!" "$GREEN"
+success "Finished Package Installation!"
 
 #####################################################################################################
-# Vim setup                                                                                         #
+# Vim Setup                                                                                         #
 #####################################################################################################
+
+headline "Vim Setup"
 
 # Vim plugin manager installation
-VIM_AUTOLOAD="$HOME/.vim/autoload"
-VIM_PLUG="$VIM_AUTOLOAD/plug.vim"
-mkdir -p "$VIM_AUTOLOAD"
+VIM_AUTOLOAD_DIR="$HOME/.vim/autoload"
+VIM_PLUG_DIR="$VIM_AUTOLOAD_DIR/plug.vim"
+mkdir -p "$VIM_AUTOLOAD_DIR"
 
-if [ ! -f "$VIM_PLUG" ]; then
-    cecho "Installing vim plugin manager..." "$YELLOW"
-    curl -fLo "$VIM_PLUG" --create-dirs \
+if [ ! -f "$VIM_PLUG_DIR" ]; then
+    info "Installing vim plugin manager ..."
+    curl -fLo "$VIM_PLUG_DIR" --create-dirs \
         https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    [ -f "$VIM_PLUG" ] && cecho "✅ Vim plugin manager installed!" "$GREEN" \
-                       || cecho "❌ Failed to install vim plugin manager!" "$RED"
+    [ -f "$VIM_PLUG_DIR" ] && success "Vim plugin manager installed!" \
+                       || error "Failed to install vim plugin manager!"
 else
-    cecho "Vim plugin manager already installed, skipping." "$YELLOW"
+    info "Vim plugin manager already installed, skipping."
 fi
 
-cecho "Installing Vim plugins..." "$YELLOW"
-vim -es -u "$CONFIGDIR/.vimrc" +PlugInstall +qall
-cecho "✅ Vim setup completed!" "$GREEN"
+# Vim plugin silent installation
+info "Installing Vim plugins ..."
+vim -es -u "$CONFIG_DIR/.vimrc" +PlugInstall +qall
+success "Vim Setup completed!"
 
 #####################################################################################################
-# Post installation                                                                                 #
+# Post Installation                                                                                 #
 #####################################################################################################
 
-cecho "✅ Installation finished!" "$GREEN"
+headline "Installation finished!"
