@@ -22,18 +22,33 @@ zstyle ':vcs_info:*' unstagedstr '*'
 # Prompt themes:                                                                    #
 #####################################################################################
 
-function precmd() {
-    # Print a newline before the prompt, unless it's the first prompt in the process.
-    if [ -z "$NEW_LINE_BEFORE_PROMPT" ]; then
-        NEW_LINE_BEFORE_PROMPT=1
-    elif [ "$NEW_LINE_BEFORE_PROMPT" -eq 1 ]; then
+# PRECMD logic: controls blank lines before prompts
+precmd() {
+    # If 'clear' was just run, skip printing a blank line
+    if [[ "$CLEAR_TRIGGER" == 1 ]]; then
+        CLEAR_TRIGGER=0
+        return
+    fi
+
+    # After the 1st prompt, always print a blank line before each prompt
+    if [[ -n "$_HAS_PROMPTED_ONCE" ]]; then
         echo ""
+    else
+        _HAS_PROMPTED_ONCE=1
+    fi
+}
+
+# PREEXEC to detect commands before execution
+preexec() {
+    if [[ "$1" == "clear" ]]; then
+        CLEAR_TRIGGER=1
     fi
 }
 
 # Pure prompt theme
 NEWLINE=$'\n'
-PROMPT='%F{014}%c%f${vcs_info_msg_0_}${NEWLINE}%(!.#.%F{046}❯%f) '
+PROMPT='%F{014}%c%f${vcs_info_msg_0_}'"$NEWLINE"'%(!.#.%F{046}❯%f) '
+
 # VCS (Git) style
 zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 
@@ -41,8 +56,6 @@ zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 # Shortcuts & aliases:                                                              #
 #####################################################################################
 
-# Aliases
 alias gpgf="git pull && git fetch"
 alias bubu="brew update && brew upgrade && brew cleanup"
 alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
-
