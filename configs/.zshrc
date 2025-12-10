@@ -22,7 +22,7 @@ zstyle ':vcs_info:*' unstagedstr '*'
 # Prompt themes:                                                                    #
 #####################################################################################
 
-# PRECMD logic: controls blank lines before prompts
+# PRECMD: Controls blank lines before prompts
 precmd() {
     # If 'clear' was just run, skip printing a blank line
     if [[ "$CLEAR_TRIGGER" == 1 ]]; then
@@ -38,7 +38,7 @@ precmd() {
     fi
 }
 
-# PREEXEC to detect commands before execution
+# PREEXEC: Detect commands before execution
 preexec() {
     if [[ "$1" == "clear" ]]; then
         CLEAR_TRIGGER=1
@@ -58,4 +58,5 @@ zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 
 alias gpgf="git pull && git fetch"
 alias bubu="brew update && brew upgrade && brew cleanup"
+alias cclean="zsh ${ZDOTDIR:-$HOME}/.dotfiles/scripts/cleanup.sh"
 alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
