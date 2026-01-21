@@ -15,7 +15,6 @@ brew update && brew upgrade
 #####################################################################################################
 
 # Languages
-brew install go
 brew install python@3.12
 brew install python-tk@3.12
 
@@ -32,7 +31,7 @@ brew install smartmontools # smartctl -A /dev/disk0
 # Brew casks                                                                                        #
 #####################################################################################################
 
-brew install --cask google-chrome
+brew install --cask brave-browser
 brew install --cask discord
 brew install --cask spotify
 brew install --cask coconutbattery
