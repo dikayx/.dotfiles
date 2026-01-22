@@ -1,19 +1,32 @@
 #!/bin/zsh
 
+#####################################################################################################
+# My cleanup script to remove old cache and log files                                                #
+#####################################################################################################
+
 set -euo pipefail
 
+#####################################################################################################
+# Configuration                                                                                      #
+#####################################################################################################
+
 HOME_DIR="$HOME"
+USR_LIB_DIR="$HOME_DIR/Library"
 PRUNE_DAYS=10
 
 # Cleanup targets
 TARGET_DIRS=(
-  "$HOME_DIR/Library/Logs"
-  "$HOME_DIR/Library/Caches/Homebrew/downloads"
-  "$HOME_DIR/Library/Caches/com.spotify.client/Data"
-  "$HOME_DIR/Library/Application Support/discord/Cache/Cache_Data"
+  "$USR_LIB_DIR/Logs"
+  "$USR_LIB_DIR/Caches/Homebrew/downloads"
+  "$USR_LIB_DIR/Caches/com.spotify.client/Data"
+  "$USR_LIB_DIR/Application Support/discord/Cache/Cache_Data"
 )
 
 echo "Scanning for files older than $PRUNE_DAYS days..."
+
+#####################################################################################################
+# Calculate total size to be deleted                                                                #
+#####################################################################################################
 
 TOTAL_SIZE=0
 
@@ -40,7 +53,10 @@ done
 echo
 echo "Deleting files older than $PRUNE_DAYS days..."
 
-# Delete only real directories
+#####################################################################################################
+# Delete old files                                                                                   #
+#####################################################################################################
+
 for DIR in "${TARGET_DIRS[@]}"; do
     if [[ -d "$DIR" ]]; then
         # For testing: uncomment to preview instead of deleting
