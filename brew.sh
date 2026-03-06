@@ -16,10 +16,6 @@ brew update && brew upgrade
 
 # Languages
 brew install python@3.12
-brew install python-tk@3.12
-
-# Databases
-brew install sqlite
 
 # Tools
 brew install git
@@ -31,11 +27,13 @@ brew install smartmontools # smartctl -A /dev/disk0
 # Brew casks                                                                                        #
 #####################################################################################################
 
+# General
 brew install --cask brave-browser
 brew install --cask discord
 brew install --cask spotify
 brew install --cask coconutbattery
 
+# Development
 brew install --cask visual-studio-code
 brew install --cask git-credential-manager
 
