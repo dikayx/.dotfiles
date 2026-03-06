@@ -44,9 +44,9 @@
 #
 #   2. Configuration Setup
 #      - Creates expected directories
+#      - Dynamically builds .gitconfig
 #      - Reads all config files from ~/.dotfiles/configs
 #      - Symlinks them into the home directory
-#      - Applies Git configuration if provided
 #
 #   3. Package Installation
 #      - Installs Homebrew if not already present
@@ -220,6 +220,29 @@ headline "Configuration Setup"
 info "Creating necessary directories ..."
 mkdir -p "$HOME_DIR/Projekte"
 
+# Dynamically generate .gitconfig
+info "Generating Git configuration ..."
+GIT_CONFIG_FILE="$CONFIG_DIR/.gitconfig"
+
+# Clear out any existing file so we start fresh
+: > "$GIT_CONFIG_FILE"
+
+# Apply core settings
+git config -f "$GIT_CONFIG_FILE" core.editor "vim"
+git config -f "$GIT_CONFIG_FILE" core.autocrlf "input"
+git config -f "$GIT_CONFIG_FILE" pull.ff "only"
+git config -f "$GIT_CONFIG_FILE" init.defaultBranch "main"
+
+echo "After generating .gitconfig:"
+
+# Apply user settings if provided
+if [ -n "$GITNAME" ]; then
+    git config -f "$GIT_CONFIG_FILE" user.name "$GITNAME"
+fi
+if [ -n "$GITMAIL" ]; then
+    git config -f "$GIT_CONFIG_FILE" user.email "$GITMAIL"
+fi
+
 # Obtain a list of config files from the config directory, ignoring . and ..
 files=()
 for f in "$CONFIG_DIR"/.*; do
@@ -240,13 +263,6 @@ for file in "${files[@]}"; do
     fi
 done
 
-# Setup git if gitname and gitemail are given
-if [ -n "$GITNAME" ] && [ -n "$GITMAIL" ]; then
-    info "Setting up Git global configuration ..."
-    git config --global user.name "$GITNAME"
-    git config --global user.email "$GITMAIL"
-fi
-    
 success "Finished Configuration Setup!"
 
 #####################################################################################################
