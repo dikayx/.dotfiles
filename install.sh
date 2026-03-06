@@ -174,8 +174,7 @@ fi
 # Directories                                                                                       #
 #####################################################################################################
 
-HOME_DIR="$HOME"
-DOTFILES_DIR="$HOME_DIR/.dotfiles"
+DOTFILES_DIR="$HOME/.dotfiles"
 CONFIG_DIR="$DOTFILES_DIR/configs"
 
 #####################################################################################################
@@ -218,7 +217,7 @@ headline "Configuration Setup"
 
 # Create necessary directories
 info "Creating necessary directories ..."
-mkdir -p "$HOME_DIR/Projekte"
+mkdir -p "$HOME/Projekte"
 
 # Dynamically generate .gitconfig
 info "Generating Git configuration ..."
@@ -255,7 +254,7 @@ done
 info "Creating symlinks ..."
 for file in "${files[@]}"; do
     src="$CONFIG_DIR/$file"
-    dest="$HOME_DIR/$file"
+    dest="$HOME/$file"
     if [ -e "$src" ]; then
         symlink "$src" "$dest"
     else
