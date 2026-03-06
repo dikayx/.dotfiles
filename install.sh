@@ -28,8 +28,7 @@
 #     ./install.sh --hostname my-mac
 #     ./install.sh --gitname "John Doe" --gitemail john@example.com
 #
-# Arguments are optional. When omitted, the script simply skips those steps. However, the Git
-# configuration requires both --gitname and --gitemail to be provided to take effect.
+# Arguments are optional. When omitted, the script simply skips those steps.
 #
 # ---------------------------------------------------------------------------------------------------
 # Script Architecture
