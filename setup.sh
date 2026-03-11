@@ -66,6 +66,7 @@ error() { echo -e "${ERR} $1"; }
 info() { echo -e "- $1"; }
 
 symlink() { ln -sf "$1" "$2" && success "Linked $2 -> $1" || error "Failed to link $2"; }
+has_git() { git --version &> /dev/null }
 
 #####################################################################################################
 # Parse command line arguments                                                                      #
@@ -122,13 +123,19 @@ fi
 
 headline "Checking Prerequisites"
 
-if ! command -v git &> /dev/null; then
+if ! has_git; then
     info "Git not found. Initiating Xcode Command Line Tools installation ..."
     xcode-select --install
-    error "Installation requires user interaction. Please complete the prompt and re-run this script."
-    exit 1
+    
+    info "Waiting for installation to complete (this may take a few minutes) ..."
+    
+    until has_git; do
+        sleep 5
+    done
+    
+    success "Xcode Command Line Tools installed!"
 else
-    info "Git is installed."
+    info "Git is already installed."
 fi
 
 success "Prerequisites met!"

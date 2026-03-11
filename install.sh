@@ -231,8 +231,6 @@ git config -f "$GIT_CONFIG_FILE" core.autocrlf "input"
 git config -f "$GIT_CONFIG_FILE" pull.ff "only"
 git config -f "$GIT_CONFIG_FILE" init.defaultBranch "main"
 
-echo "After generating .gitconfig:"
-
 # Apply user settings if provided
 if [ -n "$GITNAME" ]; then
     git config -f "$GIT_CONFIG_FILE" user.name "$GITNAME"
