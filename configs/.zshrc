@@ -60,3 +60,4 @@ alias gpgf="git pull && git fetch"
 alias bubu="brew update && brew upgrade && brew autoremove && brew cleanup"
 alias cclean="zsh ${ZDOTDIR:-$HOME}/.dotfiles/scripts/cleanup.sh"
 alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
+alias ll="ls -lGaf"
