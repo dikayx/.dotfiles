@@ -239,25 +239,14 @@ if [ -n "$GITMAIL" ]; then
     git config -f "$GIT_CONFIG_FILE" user.email "$GITMAIL"
 fi
 
-# Obtain a list of config files from the config directory, ignoring . and ..
-files=()
-for f in "$CONFIG_DIR"/.*; do
-    [[ "$(basename "$f")" == "." || "$(basename "$f")" == ".." ]] && continue
-    [[ -f "$f" ]] || continue # only regular files
-    files+=("$(basename "$f")")
-done
+# Walk through all config files in the configs/ directory and symlink them to the home directory
+while IFS= read -r -d '' src; do
+    # Compute relative path inside configs/
+    rel="${src#$CONFIG_DIR/}"
+    dest="$HOME/$rel"
 
-# Create symlinks for each config file
-info "Creating symlinks ..."
-for file in "${files[@]}"; do
-    src="$CONFIG_DIR/$file"
-    dest="$HOME/$file"
-    if [ -e "$src" ]; then
-        symlink "$src" "$dest"
-    else
-        error "$file not found in $CONFIG_DIR, skipping"
-    fi
-done
+    symlink "$src" "$dest"
+done < <(find "$CONFIG_DIR" -maxdepth 1 -name ".*" -type f -print0)
 
 success "Finished Configuration Setup!"
 
