@@ -56,8 +56,13 @@ zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 # Shortcuts & aliases:                                                              #
 #####################################################################################
 
-alias gpgf="git pull && git fetch"
+# Aliases
 alias bubu="brew update && brew upgrade && brew autoremove && brew cleanup"
-alias cclean="zsh ${ZDOTDIR:-$HOME}/.dotfiles/scripts/cleanup.sh"
 alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
+alias gpgf="git pull && git fetch"
 alias ll="ls -lGaf"
+
+# Custom scripts
+alias cclean="zsh ${ZDOTDIR:-$HOME}/.dotfiles/scripts/cleanup.sh"
+alias chkdsk="zsh ${ZDOTDIR:-$HOME}/.dotfiles/scripts/chkdsk.sh"
+alias makevenv="zsh ${ZDOTDIR:-$HOME}/.dotfiles/scripts/makevenv.sh"

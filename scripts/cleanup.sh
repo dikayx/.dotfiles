@@ -19,6 +19,7 @@ TARGET_DIRS=(
   "$USR_LIB_DIR/Logs"
   "$USR_LIB_DIR/Caches/Homebrew/downloads"
   "$USR_LIB_DIR/Caches/com.spotify.client/Data"
+  "$USR_LIB_DIR/Caches/BraveSoftware/Brave-Browser/Default/Cache/Cache_Data"
   "$USR_LIB_DIR/Application Support/discord/Cache/Cache_Data"
 )
 
@@ -59,9 +60,6 @@ echo "Deleting files older than $PRUNE_DAYS days..."
 
 for DIR in "${TARGET_DIRS[@]}"; do
     if [[ -d "$DIR" ]]; then
-        # For testing: uncomment to preview instead of deleting
-        # find "$DIR" -type f -mtime +"$PRUNE_DAYS" -print
-
         find "$DIR" -type f -mtime +"$PRUNE_DAYS" -delete 2>/dev/null
     fi
 done
