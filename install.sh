@@ -262,9 +262,16 @@ if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
+# Homebrew changed its default behavior to ask for confirmation during package installation. To 
+# maintain a smooth, non-interactive installation process, we set the HOMEBREW_NO_ASK environment.
+export HOMEBREW_NO_ASK=1
+
 info "Installing packages ..."
 ./brew.sh
 success "Finished Package Installation!"
+
+# Revert to default behavior for Homebrew
+unset HOMEBREW_NO_ASK
 
 #####################################################################################################
 # Vim Setup                                                                                         #
