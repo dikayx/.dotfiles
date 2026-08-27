@@ -57,7 +57,7 @@ zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 #####################################################################################
 
 # Aliases
-alias bubu="brew update && brew upgrade -y && brew autoremove -y && brew cleanup -y"
+alias bubu="brew update && brew upgrade -y && brew autoremove && brew cleanup"
 alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
 alias gpgf="git pull && git fetch"
 alias ll="ls -lGaf"
