@@ -1,10 +1,10 @@
 # Brewfile - package manifest for `brew bundle`
 
 # Tools
+brew "fastfetch"
 brew "git"
 brew "jq"
 brew "ncdu"
-brew "neofetch"
 brew "smartmontools"    # smartctl -A /dev/disk0
 brew "tmux-mem-cpu-load"
 
