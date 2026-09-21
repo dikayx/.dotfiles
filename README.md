@@ -1,5 +1,8 @@
 # 🏡 Feel like home on any mac
 
+> [!IMPORTANT]
+> The configurations and scripts in this repository are **HIGHLY PERSONALIZED** to my own preferences and workflows. If you decide to use them, please be aware that they will **MODIFY** your current system, potentially making some changes that are **IRREVERSIBLE** without a fresh installation of your operating system.
+
 ## One-click-setup
 
 ```bash
@@ -9,8 +12,7 @@ curl -fsSL https://raw.githubusercontent.com/dikayx/.dotfiles/main/setup.sh | ba
 ---
 
 <details>
-
-<summary>Manual setup</summary>
+<summary>Setup Details</summary>
 
 ## Manual setup
 

@@ -1,83 +1,52 @@
-"""""""""""""
-" Plugins
-"""""""""""""
+" --- Plugins ---
 call plug#begin()
 Plug 'cocopon/iceberg.vim'
-Plug 'sheerun/vim-polyglot' " May cause issues with neovim
+Plug 'sheerun/vim-polyglot'         " May cause issues with neovim
 Plug 'luochen1990/rainbow'
 Plug 'itchyny/lightline.vim'
 Plug 'vim-syntastic/syntastic'
 Plug 'airblade/vim-gitgutter'
-call plug#end()
+call plug#end()                     " Also runs 'syntax enable' and 'filetype plugin indent on'
 
-"""""""""""""
-" Theme
-"""""""""""""
-set t_Co=256
+" --- Theme ---
 set background=dark
 colorscheme iceberg
+let g:lightline = {'colorscheme': 'wombat'}
 
-let g:lightline = {
-      \ 'colorscheme': 'wombat',
-      \ }
-
-"""""""""""""
-" Visuals
-"""""""""""""
-syntax on
+" --- Visuals ---
 set visualbell
-set laststatus=2    " File name in statusbar
-set hlsearch        " Highlight search results
-set incsearch
+set laststatus=2                    " Always show the statusbar
+set hlsearch incsearch
 set cursorline
-hi clear CursorLine " Set underline in theme
+hi clear CursorLine                 " Underline instead of highlight
 hi CursorLine gui=underline cterm=underline
 
-"""""""""""""
-" Editing
-"""""""""""""
-set number          " Position in code
-set ruler
-set signcolumn=yes
-set encoding=utf-8  " Default file encoding
-set wrap            " Line wrap
-set autoindent      " Auto + smart indent for code
-set smartindent
-set mouse=r         " Mouse support for copy and paste
-set ts=4            " Default tab width
-set tabstop=4
-set shiftwidth=4
+" --- Editing ---
+set number signcolumn=yes
+set encoding=utf-8
+set autoindent
+set tabstop=4 shiftwidth=4
 
-"""""""""""""
-" Misc
-"""""""""""""
-set nobackup        " Disable backup files
-set nowritebackup
-set updatetime=300  " Reduce delay
+set mouse=a
+set mousemodel=extend               " Right-click extends selection by default; we override it below
+if !has('nvim') && has('mouse_sgr')
+  set ttymouse=sgr                  " Reliable mouse reporting through tmux
+endif
 
-"""""""""""""
-" Functions
-"""""""""""""
-function! SetTab(n) " Set tab width to n spaces
-    let &l:tabstop=a:n
-    let &l:softtabstop=a:n
-    let &l:shiftwidth=a:n
-    set expandtab
+" Right-click in visual mode: copy to macOS clipboard, then the selection disappears
+xnoremap <silent> <RightMouse> y:call system('pbcopy', @")<CR>
+nnoremap <RightMouse> <Nop>
+
+" --- Misc ---
+set nobackup nowritebackup          " Disable backup files
+set updatetime=300                  " Reduce delay
+
+" --- Commands ---
+command! -nargs=1 SetTab setlocal expandtab tabstop=<args> shiftwidth=0 softtabstop=-1
+
+function! Trim()                    " Trim trailing whitespace in the whole file
+  let l:save = winsaveview()
+  keeppatterns %s/\s\+$//e
+  call winrestview(l:save)
 endfunction
-command! -nargs=1 SetTab call SetTab(<f-args>)
-
-function! Trim()    " Trim extra whitespace in whole file
-    let l:save = winsaveview()
-    keeppatterns %s/\s\+$//e
-    call winrestview(l:save)
-endfun
-command! -nargs=0 Trim call Trim()
-
-function! GitBranch() " Retrieve current git branch to display in statusbar
-  return system("git rev-parse --abbrev-ref HEAD 2>/dev/null | tr -d '\n'")
-endfunction
-
-function! StatuslineGit()
-  let l:branchname = GitBranch()
-  return strlen(l:branchname) > 0?'  '.l:branchname.' ':''
-endfunction
+command! Trim call Trim()

@@ -1,6 +1,4 @@
-#####################################################################################
-# Basic prompt settings:                                                            #
-#####################################################################################
+### Basic prompt settings ###
 
 # Load version control information
 autoload -Uz vcs_info
@@ -18,9 +16,7 @@ zstyle ':vcs_info:*' check-for-changes true
 zstyle ':vcs_info:*' stagedstr '!'
 zstyle ':vcs_info:*' unstagedstr '*'
 
-#####################################################################################
-# Prompt themes:                                                                    #
-#####################################################################################
+### Prompt theme ###
 
 # PRECMD: Controls blank lines before prompts
 precmd() {
@@ -46,20 +42,17 @@ preexec() {
 }
 
 # Pure prompt theme
-NEWLINE=$'\n'
-PROMPT='%F{014}%c%f${vcs_info_msg_0_}'"$NEWLINE"'%(!.#.%F{046}❯%f) '
+PROMPT=$'%F{014}%c%f${vcs_info_msg_0_}\n%(!.#.%F{046}❯%f) '
 
 # VCS (Git) style
 zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 
-#####################################################################################
-# Shortcuts & aliases:                                                              #
-#####################################################################################
+### Shortcuts & aliases ###
 
 # Aliases
 alias bubu="brew update && brew upgrade -y && brew autoremove && brew cleanup"
-alias gclone='f(){ git clone "$1" && cd "$(basename "$1" .git)" && code .; }; f'
 alias gpgf="git pull && git fetch"
+alias l="ls -lGa"
 alias ll="ls -lGaf"
 
 # Custom scripts
@@ -67,4 +60,3 @@ _SCRIPTS_DIR="${ZDOTDIR:-$HOME}/.dotfiles/scripts"
 alias cleanup="zsh ${_SCRIPTS_DIR}/cleanup.sh"
 alias chkbrew="zsh ${_SCRIPTS_DIR}/chkbrew.sh"
 alias chkdsk="zsh ${_SCRIPTS_DIR}/chkdsk.sh"
-alias makevenv="zsh ${_SCRIPTS_DIR}/makevenv.sh"
