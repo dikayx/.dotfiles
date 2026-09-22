@@ -1,6 +1,5 @@
 #!/usr/bin/env zsh
 
-# Exit on error
 set -euo pipefail
 
 ### Colors & helpers ###

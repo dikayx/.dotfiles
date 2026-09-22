@@ -1,68 +1,50 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
-#####################################################################################################
-# My cleanup script to remove old cache and log files                                                #
-#####################################################################################################
+# My DIY 'Clean your Mac'
 
 set -euo pipefail
 
-#####################################################################################################
-# Configuration                                                                                      #
-#####################################################################################################
+### Configuration ###
 
-HOME_DIR="$HOME"
-USR_LIB_DIR="$HOME_DIR/Library"
+LIB_DIR="$HOME/Library"
 PRUNE_DAYS=10
 
-# Cleanup targets
 TARGET_DIRS=(
-  "$USR_LIB_DIR/Logs"
-  "$USR_LIB_DIR/Caches/Homebrew/downloads"
-  "$USR_LIB_DIR/Caches/com.spotify.client/Data"
-  "$USR_LIB_DIR/Caches/BraveSoftware/Brave-Browser/Default/Cache/Cache_Data"
-  "$USR_LIB_DIR/Application Support/discord/Cache/Cache_Data"
+    "$LIB_DIR/Logs"
+    "$LIB_DIR/Caches/Homebrew/downloads"
+    "$LIB_DIR/Caches/com.spotify.client/Data"
+    "$LIB_DIR/Caches/EcosiaBrowser/Default/Cache/Cache_Data"
+    "$LIB_DIR/Caches/EcosiaBrowser/Default/Code Cache/js"
+    "$LIB_DIR/Application Support/discord/Cache/Cache_Data"
 )
 
-echo "Scanning for files older than $PRUNE_DAYS days..."
+### Helpers ###
 
-#####################################################################################################
-# Calculate total size to be deleted                                                                #
-#####################################################################################################
+to_mb() { awk -v b="$1" 'BEGIN { printf "%.2f", b / 1024 / 1024 }'; }
 
-TOTAL_SIZE=0
-
-# Function to calculate size in bytes
-calculate_size() {
-    local dir="$1"
-    find "$dir" -type f -mtime +"$PRUNE_DAYS" -exec stat -f%z {} + 2>/dev/null \
-        | awk '{s+=$1} END {print s+0}'
+# Deletes files older than $PRUNE_DAYS in $1, printing the bytes freed.
+# stat and rm are chained on the same find pass, so each file is
+# sized before it's removed - no second traversal needed.
+prune_dir() {
+    find "$1" -type f -mtime +"$PRUNE_DAYS" \
+        -exec stat -f%z {} + -exec rm {} + 2>/dev/null \
+        | awk '{s+=$1} END {print s+0}' || true
 }
 
-for DIR in "${TARGET_DIRS[@]}"; do
-    if [[ -d "$DIR" ]]; then
-        SIZE_BYTES=$(calculate_size "$DIR")
-        SIZE_MB=$(awk -v bytes="$SIZE_BYTES" 'BEGIN {printf "%.2f", bytes/1024/1024}')
+### Cleanup ###
 
-        echo "$DIR → ${SIZE_MB} MB will be deleted"
+echo "Pruning files older than $PRUNE_DAYS days...\n"
 
-        TOTAL_SIZE=$((TOTAL_SIZE + SIZE_BYTES))
+total=0
+
+for dir in "${TARGET_DIRS[@]}"; do
+    if [[ -d "$dir" ]]; then
+        bytes=$(prune_dir "$dir")
+        echo "$dir → $(to_mb "$bytes") MB deleted"
+        total=$((total + bytes))
     else
-        echo "Skipping missing directory: $DIR"
+        echo "Skipping missing directory: $dir"
     fi
 done
 
-echo
-echo "Deleting files older than $PRUNE_DAYS days..."
-
-#####################################################################################################
-# Delete old files                                                                                   #
-#####################################################################################################
-
-for DIR in "${TARGET_DIRS[@]}"; do
-    if [[ -d "$DIR" ]]; then
-        find "$DIR" -type f -mtime +"$PRUNE_DAYS" -delete 2>/dev/null
-    fi
-done
-
-TOTAL_MB=$(awk -v bytes="$TOTAL_SIZE" 'BEGIN {printf "%.2f", bytes/1024/1024}')
-echo "Cleanup complete. Total deleted: ${TOTAL_MB} MB"
+echo "\nCleanup complete. Total deleted: $(to_mb "$total") MB"

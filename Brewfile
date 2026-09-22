@@ -1,18 +1,17 @@
 # Brewfile - package manifest for `brew bundle`
 
-# Tools
+### Tools ###
 brew "fastfetch"
 brew "git"
-brew "jq"
 brew "ncdu"
 brew "smartmontools"    # smartctl -A /dev/disk0
 brew "tmux-mem-cpu-load"
 
-# Casks - General
+### General ###
 cask "discord"
 cask "spotify"
 cask "coconutbattery"
 
-# Casks - Development
+### Development ###
 cask "visual-studio-code"
 cask "git-credential-manager"
