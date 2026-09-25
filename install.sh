@@ -82,7 +82,7 @@ done < <(find "$CONFIG_DIR" -maxdepth 1 -name ".*" -type f -print0)
 
 # Symlink/copy settings from settings/ to their respective locations
 mkdir -p "${HOME}/.config/ghostty"
-symlink "$CONFIG_DIR/settings/ghostty-config" "${HOME}/.config/ghostty/config"
+symlink "$DOTFILES_DIR/settings/ghostty-config" "${HOME}/.config/ghostty/config"
 
 headline "Package Installation"
 

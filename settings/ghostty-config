@@ -1,0 +1,84 @@
+# Ghostty terminal settings, linked to ~/.config/ghostty/config by install.sh
+
+# CMS theme: Predawn-derived (grays from Arthur, magenta from Nord).
+# Comments can't share a line with a value, so each slot's role sits above it.
+background = #1b1d1e
+foreground = #e6e6d6
+
+# 0: black — rarely text; some TUIs paint backgrounds with it
+palette = 0=#3d352a
+# 1: red — errors, git deletions
+palette = 1=#cd5c5c
+# 2: green — success, git additions, ls executables
+palette = 2=#b4d388
+# 3: yellow — warnings, ls directories (bold)
+palette = 3=#f49d62
+# 4: blue — info, symlinks
+palette = 4=#92bfbf
+# 5: magenta — syntax highlighting, misc
+palette = 5=#b48ead
+# 6: cyan — git hunk headers, misc
+palette = 6=#92bfbf
+# 7: white — light-gray text
+palette = 7=#bbaa99
+# 8: bright black — dim/secondary text, comments
+palette = 8=#554444
+# 9: bright red — zsh error messages
+palette = 9=#cd5c5c
+# 10-14: bright variants (reused where one shade is enough)
+palette = 10=#b4d388
+palette = 11=#ede480
+palette = 12=#bddcdc
+palette = 13=#b48ead
+palette = 14=#bddcdc
+# 15: bright white
+palette = 15=#f1f1f1
+
+
+font-family = Source Code Pro
+font-style = SemiBold
+font-size = 30
+
+font-style-bold = Black
+font-style-italic = SemiBold Italic
+font-style-bold-italic = Black Italic
+
+cursor-style = bar
+cursor-style-blink = false
+cursor-color = #cccccc
+
+mouse-hide-while-typing = true
+
+working-directory = home
+window-inherit-working-directory = false
+
+window-decoration = false
+window-padding-x = 18
+window-padding-y = 18
+window-padding-balance = true
+
+# Auto-brighten text that would be unreadable against the background
+minimum-contrast = 1.1
+
+# Slot 8's dim brown
+selection-background = #554444
+# Selected text keeps each character's own color (unset would invert it)
+selection-foreground = cell-foreground
+
+# Option acts as Meta/Alt for shell shortcuts
+macos-option-as-alt = true
+
+# Plain-text copy by default (the "mixed" default adds an HTML copy that
+# rich-text fields prefer, splitting colored prompts across lines).
+# Cmd+Shift+C copies with formatting when colors are wanted.
+keybind = super+c=copy_to_clipboard:plain
+keybind = copy=copy_to_clipboard:plain
+keybind = super+shift+c=copy_to_clipboard:html
+
+# Over SSH send TERM=xterm-256color (hosts rarely know xterm-ghostty) and offer COLORTERM
+shell-integration-features = ssh-env
+
+# Use non-native macOS fullscreen, hide the menu bar
+macos-non-native-fullscreen = true
+
+auto-update = check
