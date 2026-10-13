@@ -16,6 +16,5 @@ cask "spotify"
 cask "coconutbattery"
 
 ### Development ###
-cask "ghostty"
 cask "visual-studio-code"
 cask "git-credential-manager"
