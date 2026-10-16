@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/zsh
 
 # My DIY 'Clean your Mac'
 
@@ -12,7 +12,7 @@ PRUNE_DAYS=10
 TARGET_DIRS=(
     "$LIB_DIR/Logs"
     "$LIB_DIR/Caches/Homebrew/downloads"
-    "$LIB_DIR/Caches/com.spotify.client/Data"
+    "$LIB_DIR/Caches/com.spotify.client/Browser/Cache/Cache_Data"
     "$LIB_DIR/Caches/EcosiaBrowser/Default/Cache/Cache_Data"
     "$LIB_DIR/Caches/EcosiaBrowser/Default/Code Cache/js"
     "$LIB_DIR/Application Support/discord/Cache/Cache_Data"
@@ -27,8 +27,8 @@ to_mb() { awk -v b="$1" 'BEGIN { printf "%.2f", b / 1024 / 1024 }'; }
 # sized before it's removed - no second traversal needed.
 prune_dir() {
     find "$1" -type f -mtime +"$PRUNE_DAYS" \
-        -exec stat -f%z {} + -exec rm {} + 2>/dev/null \
-        | awk '{s+=$1} END {print s+0}' || true
+    -exec stat -f%z {} \; -exec rm -f {} \; 2>/dev/null \
+    | awk '{s+=$1} END {print s+0}'
 }
 
 ### Cleanup ###
