@@ -1,0 +1,10 @@
+# winget package IDs (Windows 11) - one per line, '#' starts a comment
+Git.Git                           # includes Git Credential Manager
+vim.vim
+Python.Python.3.13
+Fastfetch-cli.Fastfetch
+WinDirStat.WinDirStat             # stands in for ncdu
+smartmontools.smartmontools       # smartctl
+Discord.Discord
+Spotify.Spotify                   # refuses to install from an elevated shell - run install.ps1 unelevated
+Microsoft.VisualStudioCode

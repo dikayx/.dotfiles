@@ -8,7 +8,9 @@ brew "fastfetch"
 brew "git"
 brew "ncdu"
 brew "smartmontools"    # smartctl -A /dev/disk0
+brew "tmux"
 brew "tmux-mem-cpu-load"
+brew "tree"          # used by the `lt` alias
 
 ### General ###
 cask "discord"

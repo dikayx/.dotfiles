@@ -1,0 +1,22 @@
+# apt packages (Linux Mint / Ubuntu / Debian) - one per line
+
+### Shell & terminal ###
+zsh
+tmux
+tmux-mem-cpu-load
+vim
+curl
+xclip              # clipboard for vim / tmux (scripts/clipcopy)
+
+### Languages ###
+python3
+python3-pip
+python3-venv
+
+### Tools ###
+fastfetch          # PPA is added automatically if the release has no package
+git
+ncdu
+smartmontools      # smartctl -A /dev/nvme0
+tree
+dconf-cli          # terminal profile import

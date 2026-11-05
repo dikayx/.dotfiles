@@ -1,22 +1,42 @@
-#!/bin/zsh
+#!/bin/bash
 
-# My DIY 'Clean your Mac'
+# My DIY 'Clean your Mac / Linux box'
 
 set -euo pipefail
 
 ### Configuration ###
 
-LIB_DIR="$HOME/Library"
 PRUNE_DAYS=10
 
-TARGET_DIRS=(
-    "$LIB_DIR/Logs"
-    "$LIB_DIR/Caches/Homebrew/downloads"
-    "$LIB_DIR/Caches/com.spotify.client/Browser/Cache/Cache_Data"
-    "$LIB_DIR/Caches/EcosiaBrowser/Default/Cache/Cache_Data"
-    "$LIB_DIR/Caches/EcosiaBrowser/Default/Code Cache/js"
-    "$LIB_DIR/Application Support/discord/Cache/Cache_Data"
-)
+case "$(uname -s)" in
+    Darwin)
+        LIB_DIR="$HOME/Library"
+        STAT_SIZE=(stat -f%z)
+        TARGET_DIRS=(
+            "$LIB_DIR/Logs"
+            "$LIB_DIR/Caches/Homebrew/downloads"
+            "$LIB_DIR/Caches/com.spotify.client/Browser/Cache/Cache_Data"
+            "$LIB_DIR/Caches/EcosiaBrowser/Default/Cache/Cache_Data"
+            "$LIB_DIR/Caches/EcosiaBrowser/Default/Code Cache/js"
+            "$LIB_DIR/Application Support/discord/Cache/Cache_Data"
+        )
+        ;;
+    Linux)
+        STAT_SIZE=(stat -c%s)
+        TARGET_DIRS=(
+            "$HOME/.cache/thumbnails"
+            "$HOME/.cache/spotify"
+            "$HOME/.config/discord/Cache/Cache_Data"
+            # Flatpak builds of Spotify / Discord
+            "$HOME/.var/app/com.spotify.Client/cache"
+            "$HOME/.var/app/com.discordapp.Discord/config/discord/Cache/Cache_Data"
+        )
+        ;;
+    *)
+        echo "Unsupported OS: $(uname -s)" >&2
+        exit 1
+        ;;
+esac
 
 ### Helpers ###
 
@@ -27,13 +47,13 @@ to_mb() { awk -v b="$1" 'BEGIN { printf "%.2f", b / 1024 / 1024 }'; }
 # sized before it's removed - no second traversal needed.
 prune_dir() {
     find "$1" -type f -mtime +"$PRUNE_DAYS" \
-    -exec stat -f%z {} \; -exec rm -f {} \; 2>/dev/null \
+    -exec "${STAT_SIZE[@]}" {} \; -exec rm -f {} \; 2>/dev/null \
     | awk '{s+=$1} END {print s+0}'
 }
 
 ### Cleanup ###
 
-echo "Pruning files older than $PRUNE_DAYS days...\n"
+printf 'Pruning files older than %s days...\n\n' "$PRUNE_DAYS"
 
 total=0
 
@@ -47,4 +67,4 @@ for dir in "${TARGET_DIRS[@]}"; do
     fi
 done
 
-echo "\nCleanup complete. Total deleted: $(to_mb "$total") MB"
+printf '\nCleanup complete. Total deleted: %s MB\n' "$(to_mb "$total")"

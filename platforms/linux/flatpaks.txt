@@ -1,0 +1,3 @@
+# Flatpak apps (Flathub) - one application ID per line
+com.discordapp.Discord
+com.spotify.Client

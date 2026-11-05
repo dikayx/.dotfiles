@@ -33,8 +33,11 @@ if !has('nvim') && has('mouse_sgr')
   set ttymouse=sgr                  " Reliable mouse reporting through tmux
 endif
 
-" Right-click in visual mode: copy to macOS clipboard, then the selection disappears
-xnoremap <silent> <RightMouse> y:call system('pbcopy', @")<CR>
+" Right-click in visual mode: copy to the system clipboard, then the selection disappears
+function! s:ClipCopy(text) abort
+  call system(has('win32') ? 'clip' : expand('~/.dotfiles/scripts/clipcopy'), a:text)
+endfunction
+xnoremap <silent> <RightMouse> y:call <SID>ClipCopy(@")<CR>
 nnoremap <RightMouse> <Nop>
 
 " --- Misc ---

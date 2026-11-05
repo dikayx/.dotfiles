@@ -49,14 +49,15 @@ zstyle ':vcs_info:git:*' formats ' %F{032}git%f:(%F{011}%b%u%c%f)'
 
 ### Shortcuts & aliases ###
 
-# Aliases
-alias bubu="brew update && brew upgrade -y && brew autoremove && brew cleanup"
+# Aliases (OS specific ones - bubu, l, ll - live in ~/.zshrc.os)
 alias gpgf="git pull && git fetch"
-alias l="ls -lGa"
-alias ll="ls -lGaf"
+alias lt="tree -C -L 2 --dirsfirst --noreport --charset=ascii"
 
 # Custom scripts
 _SCRIPTS_DIR="${ZDOTDIR:-$HOME}/.dotfiles/scripts"
-alias cleanup="zsh ${_SCRIPTS_DIR}/cleanup.sh"
-alias chkbrew="zsh ${_SCRIPTS_DIR}/chkbrew.sh"
-alias chkdsk="zsh ${_SCRIPTS_DIR}/chkdsk.sh"
+alias cleanup="bash ${_SCRIPTS_DIR}/cleanup.sh"
+alias chkdsk="bash ${_SCRIPTS_DIR}/chkdsk.sh"
+
+### OS specific settings ###
+
+[[ -r "$HOME/.zshrc.os" ]] && source "$HOME/.zshrc.os"

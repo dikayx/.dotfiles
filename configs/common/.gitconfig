@@ -1,0 +1,21 @@
+[core]
+	editor = vim
+	autocrlf = input
+[pull]
+	ff = only
+[init]
+	defaultBranch = main
+[user]
+	name = Dan Koller
+	email = 57103678+dikayx@users.noreply.github.com
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+
+# Per-OS settings (credential helper, ...) - linked from configs/<os>/.gitconfig.os
+[include]
+	path = ~/.gitconfig.os
+# Machine-local overrides (identity passed to the installer) - never tracked.
+# Note: '--global' writes would land in the tracked file, use:
+#   git config --file ~/.gitconfig.local user.name "..."
+[include]
+	path = ~/.gitconfig.local

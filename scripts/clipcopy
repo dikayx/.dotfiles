@@ -1,0 +1,18 @@
+#!/bin/bash
+# Copies stdin to the system clipboard (used by .vimrc and .tmux.conf).
+# Picks whatever the current OS / session provides.
+
+if command -v pbcopy >/dev/null 2>&1; then
+    exec pbcopy
+elif [ -n "${WAYLAND_DISPLAY:-}" ] && command -v wl-copy >/dev/null 2>&1; then
+    exec wl-copy
+elif command -v xclip >/dev/null 2>&1; then
+    exec xclip -selection clipboard -in
+elif command -v xsel >/dev/null 2>&1; then
+    exec xsel --clipboard --input
+elif command -v clip.exe >/dev/null 2>&1; then   # WSL
+    exec clip.exe
+fi
+
+echo "clipcopy: no clipboard tool found (install xclip or wl-clipboard)" >&2
+exit 1

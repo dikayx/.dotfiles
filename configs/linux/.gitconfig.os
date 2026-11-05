@@ -1,0 +1,4 @@
+[credential]
+	helper =
+	helper = /usr/local/bin/git-credential-manager
+	credentialStore = secretservice

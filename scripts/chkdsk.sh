@@ -1,11 +1,15 @@
-#!/bin/zsh
+#!/bin/bash
 
-# Check SSD wear/health on macOS (requires smartmontools, assumes an NVMe SSD)
+# Check SSD wear/health on macOS and Linux (requires smartmontools, assumes an NVMe SSD)
 
 set -euo pipefail
 
 SCRIPT_NAME="$(basename "$0")"
-DEFAULT_DEVICE="disk0"
+case "$(uname -s)" in
+    Darwin) OS="macos"; DEFAULT_DEVICE="disk0"; INSTALL_HINT="brew install smartmontools" ;;
+    Linux)  OS="linux"; DEFAULT_DEVICE="nvme0"; INSTALL_HINT="sudo apt install smartmontools" ;;
+    *)      echo "Error: unsupported OS '$(uname -s)'." >&2; exit 1 ;;
+esac
 
 ### Helpers ###
 
@@ -22,11 +26,11 @@ Prints the wear/health status of an SSD, e.g.:
     SSD Healthy (98% remaining)
 
 Arguments:
-  device    Optional BSD disk identifier (e.g. disk0, disk1, /dev/disk0).
+  device    Optional disk identifier (macOS: disk0, /dev/disk0; Linux: nvme0, /dev/nvme0).
             Defaults to '${DEFAULT_DEVICE}'.
 
 Requirements:
-  - smartmontools installed (brew install smartmontools)
+  - smartmontools installed (brew / apt install smartmontools)
   - root privileges, only if unprivileged access is denied (the script
     tries without sudo first and escalates automatically if needed)
 
@@ -45,17 +49,23 @@ fi
 
 ### Prerequisites ###
 
-[[ "$(uname -s)" == "Darwin" ]] || die "This script is intended for macOS only."
+list_disks() {
+    if [[ "$OS" == "macos" ]]; then
+        diskutil list 2>/dev/null | grep -E '^/dev/disk' || echo '  (unable to list disks)'
+    else
+        lsblk -d -o NAME,SIZE,MODEL 2>/dev/null || echo '  (unable to list disks)'
+    fi
+}
 
 command -v smartctl >/dev/null 2>&1 \
-    || die "smartctl not found. Install smartmontools first, e.g.: brew install smartmontools"
+    || die "smartctl not found. Install smartmontools first, e.g.: ${INSTALL_HINT}"
 
 RAW_DEVICE="${1:-$DEFAULT_DEVICE}"
 RAW_DEVICE="${RAW_DEVICE#/dev/}"      # normalize away any /dev/ prefix
 DEVICE="/dev/${RAW_DEVICE}"
 
 [[ -e "$DEVICE" ]] || die "Device '${DEVICE}' does not exist. Available disks:
-$(diskutil list 2>/dev/null | grep -E '^/dev/disk' || echo '  (unable to list disks)')"
+$(list_disks)"
 
 ### Read SMART data ###
 
@@ -70,7 +80,7 @@ if [[ $STATUS -ne 0 ]] && [[ "${EUID}" -ne 0 ]] \
         || die "Reading ${DEVICE} requires root, and sudo is not available:
 ${OUTPUT}"
     echo "Insufficient permissions to read ${DEVICE}; re-running with sudo..." >&2
-    exec sudo zsh "$0" "$RAW_DEVICE"
+    exec sudo bash "$0" "$RAW_DEVICE"
 fi
 
 ### Health assessment ###
